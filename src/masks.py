@@ -36,3 +36,11 @@ def mask_account_card (card):
     card_name = ""
     card_name = card[:-15]
     card_namder = card[-16:-1]
+    user_choice = input("""Выберите режим скрытия данных. 
+    1 - Маскирует номер карты в формате XXXX XX** **** XXXX.  
+    2 - принимает на вход номер счета и возвращает его маску.
+     Номер счета замаскирован и отображается в формате **XXXX""")
+    if user_choice == 1:
+        return (card_name + get_mask_card_number(card_namder))
+    elif user_choice == 2:
+        return (card_name + get_mask_account(card_namder))
