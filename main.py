@@ -1,5 +1,5 @@
-import src\
+from src.widget import mask_account_card
 
 number_card = input("Ведите номер карты. 16 чисел")
 
-print(src.masks.mask_account_card(number_card))
+print(mask_account_card(number_card))
