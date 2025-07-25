@@ -31,3 +31,8 @@ def get_mask_account(number_card: str) -> str:
     return result
 
 def mask_account_card (card):
+
+    card_namder = ""
+    card_name = ""
+    card_name = card[:-15]
+    card_namder = card[-16:-1]
