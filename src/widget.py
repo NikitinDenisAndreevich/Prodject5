@@ -24,3 +24,15 @@ def mask_account_card(card: str) -> str:
         masked_result = card[:-16] + masked_number
 
     return masked_result
+
+def get_date(date: str) -> str:
+    """функция меняет формат даты.
+    Принимает на вход строку с датой в формате
+    "2024-03-11T02:26:18.671407"
+    и возвращает строку с датой в формате
+    "ДД.ММ.ГГГГ"("11.03.2024")
+    """
+    year = date[:4]
+    month = date[5:7]
+    day = date[8:10]
+    return f"{day}.{month}.{year}"
