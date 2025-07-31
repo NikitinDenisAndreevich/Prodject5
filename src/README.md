@@ -29,3 +29,7 @@
 
 - `sort_by_date(operations: list, reverse: bool = True) -> list`  
   Сортирует операции по дате (по умолчанию: от новых к старым)
+
+### начало работы с программой
+1. git clone git@github.com:NikitinDenisAndreevich/Prodject5.git # Сконирование программы 
+2. poetry install # установка зависимостей
