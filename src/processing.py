@@ -1,4 +1,4 @@
-from widget import get_date
+from datetime import datetime
 
 
 def filter_by_state(
@@ -17,26 +17,6 @@ def filter_by_state(
     return result
 
 
-def sort_by_date(dicts_list: list[dict], reverse_order=True) -> list[dict]:
-    """
-    Сортирует список словарей по дате в указанном порядке."""
-    result = []  # пустой список для результатов
-    correct_date = {}  # пустой словарь для проверки
-    i = 0  # для записи индекса словаря изначального
-    x = 0  # временная переменная
-    sorted_keys = []  # временная переменная для отсортировски
-    for dict in dicts_list:
-        result = get_date(dict["date"]).split('.')
-        x = int(result[0]) + int(result[1]) * 31 + int(result[2]) * 365
-        correct_date[i] = x
-        i += 1
-    # Сортируем индексы словаря
-    sorted_keys = [key for key, value in sorted(correct_date.items(), key=lambda x: x[1])]
-    result = []
-    if reverse_order is True:
-        for y in sorted_keys:
-            result.append(dicts_list[y])
-    elif reverse_order is False:
-        for y in reversed(sorted_keys):
-            result.append(dicts_list[y])
-    return result
+def sort_by_date(data_list: list, reverse: bool = True) -> list:
+    """Функция должна возвращать новый список, отсортированный по дате"""
+    return sorted(data_list, key=lambda x: datetime.fromisoformat(x["date"]), reverse=reverse)
