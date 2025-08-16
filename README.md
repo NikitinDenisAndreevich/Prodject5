@@ -27,11 +27,21 @@
 - src/widget.py `filter_by_state(operations: list, state: str = "EXECUTED") -> list`  
   Фильтрует операции по статусу (по умолчанию: "EXECUTED")
 
-- `sort_by_date(operations: list, reverse: bool = True) -> list`  
+- src/widget.py `sort_by_date(operations: list, reverse: bool = True) -> list`  
   Сортирует операции по дате (по умолчанию: от новых к старым)
 
-### В папке tests подготовлены тесты ([test_masks.py](tests%2Ftest_masks.py), [test_processing.py](tests%2Ftest_processing.py), [test_widget.py](tests%2Ftest_widget.py))
-Функциональный код покрыт тестами на 100% на 11.08.2025г.
+### ![.](https://i.ibb.co/XfkHrdsZ/New-Template-Photoroom.png) Генераторы
+- src/generators.py `filter_by_currency(transactions: list, currency: str) -> Iterator[dict]`  
+Фильтрует транзакции по коду валюты.
+
+- src/generators.py `transaction_descriptions(transactions: list) -> Iterator[str]`  
+  Возвращает итератор с описаниями транзакций.
+
+- src/generators.py `card_number_generator(begin: int, end: int) -> Iterator[str]`
+Генерирует номера карт в формате 16 цифр с ведущими нулями.
+- 
+### В папке tests подготовлены тесты ([test_masks.py](tests%2Ftest_masks.py), [test_processing.py](tests%2Ftest_processing.py), [test_widget.py](tests%2Ftest_widget.py), [test_generators.py](tests%2Ftest_generators.py))
+Функциональный код покрыт тестами на 100% на 16.08.2025г.
 ### начало работы с программой
 1. git clone git@github.com:NikitinDenisAndreevich/Prodject5.git # Сконирование программы 
 2. poetry install # установка зависимостей
