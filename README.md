@@ -30,6 +30,8 @@
 - `sort_by_date(operations: list, reverse: bool = True) -> list`  
   Сортирует операции по дате (по умолчанию: от новых к старым)
 
+### В папке tests подготовлены тесты ([test_masks.py](tests%2Ftest_masks.py), [test_processing.py](tests%2Ftest_processing.py), [test_widget.py](tests%2Ftest_widget.py))
+Функциональный код покрыт тестами на 100% на 11.08.2025г.
 ### начало работы с программой
 1. git clone git@github.com:NikitinDenisAndreevich/Prodject5.git # Сконирование программы 
 2. poetry install # установка зависимостей
