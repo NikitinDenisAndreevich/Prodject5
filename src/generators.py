@@ -1,5 +1,6 @@
 from typing import Iterator
 
+
 def filter_by_currency(transactions: list, currency: str) -> Iterator[dict]:
     """
     Фильтрует транзакции по коду валюты.
