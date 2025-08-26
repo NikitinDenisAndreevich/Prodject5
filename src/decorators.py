@@ -1,10 +1,7 @@
 import time
 
 def log(filename=None):
-    """Декоратор для логирования выполнения функций и обработки ошибок.
 
-    Если указан filename, логи записываются в файл. Иначе возвращаются строкой.
-    """
     def decorator(func):
         def wrapper(*args, **kwargs):
             try:
