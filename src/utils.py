@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 
 def load_transactions(file_path: str | Path) -> List[Dict[str, Any]]:

@@ -1,9 +1,11 @@
 import os
-import requests
 from typing import Dict, Optional
+
+import requests
 
 API_KEY = os.getenv('API_KEY')
 BASE_URL = "https://api.apilayer.com/exchangerates_data/latest"
+
 
 def get_exchange_rate(base_currency: str) -> Optional[float]:
     """Получает текущий курс валюты к RUB через API"""
@@ -22,6 +24,7 @@ def get_exchange_rate(base_currency: str) -> Optional[float]:
         return data['rates']['RUB']
     except (requests.RequestException, KeyError, ValueError):
         return None
+
 
 def convert_amount_to_rub(transaction: Dict) -> Optional[float]:
     """Конвертирует сумму транзакции в рубли"""
