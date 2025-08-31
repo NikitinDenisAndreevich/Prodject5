@@ -36,11 +36,34 @@ def test_not_a_list():
 
 def test_mixed_data_types_in_list():
     test_data = [
-        {"id": 1, "amount": 100},
+        # Валидный элемент
+        {
+            "id": 1,
+            "operationAmount": {
+                "amount": 100,
+                "currency": {"name": "USD", "code": "USD"}
+            }
+        },
+        # Невалидные элементы
         "invalid_item",
         123,
-        {"id": 2, "amount": 200}
+        # Валидный элемент
+        {
+            "id": 2,
+            "operationAmount": {
+                "amount": 200,
+                "currency": {"name": "EUR", "code": "EUR"}
+            }
+        }
     ]
+
+    with patch("pathlib.Path.is_file") as mock_is_file, \
+         patch("pathlib.Path.open", mock_open(read_data=json.dumps(test_data))):
+        mock_is_file.return_value = True
+        result = load_transactions("mixed_data.json")
+        assert len(result) == 2, "Должны остаться только 2 валидных транзакции"
+        assert result[0]["id"] == 1
+        assert result[1]["id"] == 2
 
     with patch("pathlib.Path.is_file") as mock_is_file, \
          patch("pathlib.Path.open", mock_open(read_data=json.dumps(test_data))):
@@ -93,8 +116,9 @@ def test_file_read_permission_error():
 
 def test_corrupted_data_inside_list():
     test_data = [
-        {"valid": "data"},
-        {"broken": "data", "operationAmount": "invalid"},
+        {"valid": "data", "operationAmount": {"amount": "100", "currency": "RUB"}},
+        {"broken": "data", "operationAmount": "invalid"},  # Некорректный формат
+        {"missing_fields": {"amount": 100}},  # Нет currency
         "not_a_dict"
     ]
 
@@ -103,7 +127,7 @@ def test_corrupted_data_inside_list():
         mock_is_file.return_value = True
         result = load_transactions("corrupted.json")
         assert len(result) == 1
-        assert "valid" in result[0]
+        assert result[0]["valid"] == "data"
 
 
 def test_large_numbers_handling():
