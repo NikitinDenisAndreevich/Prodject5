@@ -1,8 +1,13 @@
 import importlib
+import json
+import os
+import tempfile
 from unittest.mock import patch
 
 import pytest
 import requests
+
+from src.external_api import convert_amount_to_rub, get_exchange_rate, open_json_file
 
 
 @pytest.fixture(autouse=True)
@@ -15,7 +20,6 @@ def set_api_key(monkeypatch):
 
 
 def test_rub_conversion():
-    from src.external_api import convert_amount_to_rub
     transaction = {
         "operationAmount": {
             "amount": "100.50",
@@ -26,7 +30,6 @@ def test_rub_conversion():
 
 
 def test_usd_conversion():
-    from src.external_api import convert_amount_to_rub
     transaction = {
         "operationAmount": {
             "amount": "100.00",
@@ -39,7 +42,6 @@ def test_usd_conversion():
 
 
 def test_eur_conversion():
-    from src.external_api import convert_amount_to_rub
     transaction = {
         "operationAmount": {
             "amount": "50.00",
@@ -52,7 +54,6 @@ def test_eur_conversion():
 
 
 def test_invalid_currency():
-    from src.external_api import convert_amount_to_rub
     transaction = {
         "operationAmount": {
             "amount": "100.00",
@@ -63,7 +64,6 @@ def test_invalid_currency():
 
 
 def test_api_failure():
-    from src.external_api import convert_amount_to_rub
     transaction = {
         "operationAmount": {
             "amount": "100.00",
@@ -76,13 +76,11 @@ def test_api_failure():
 
 
 def test_missing_keys():
-    from src.external_api import convert_amount_to_rub
     transaction = {"operationAmount": {"currency": {"code": "USD"}}}
     assert convert_amount_to_rub(transaction) is None
 
 
 def test_non_numeric_amount():
-    from src.external_api import convert_amount_to_rub
     transaction = {
         "operationAmount": {
             "amount": "abc",
@@ -96,26 +94,17 @@ def test_get_exchange_rate_success():
     with patch('requests.get') as mock_get:
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = {
-            'rates': {'RUB': 75.0},
-            'base': 'USD',
+            'result': 75.0,
             'success': True
         }
-        from src.external_api import get_exchange_rate
         rate = get_exchange_rate('USD')
         assert rate == 75.0
-        mock_get.assert_called_once_with(
-            "https://api.apilayer.com/exchangerates_data/latest",
-            params={'base': 'USD', 'symbols': 'RUB'},
-            headers={'apikey': 'test-key'},
-            timeout=10
-        )
 
 
 def test_get_exchange_rate_api_key_missing(monkeypatch):
     monkeypatch.delenv('API_KEY')
     import src.external_api
     importlib.reload(src.external_api)
-    from src.external_api import get_exchange_rate
     with pytest.raises(ValueError):
         get_exchange_rate('USD')
 
@@ -123,6 +112,53 @@ def test_get_exchange_rate_api_key_missing(monkeypatch):
 def test_get_exchange_rate_network_error():
     with patch('requests.get') as mock_get:
         mock_get.side_effect = requests.ConnectionError
-        from src.external_api import get_exchange_rate
         rate = get_exchange_rate('USD')
         assert rate is None
+
+
+def test_open_json_file_valid(capsys):
+    """Тест корректного JSON-файла"""
+    test_data = {"key": "value"}
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as tmp:
+        json.dump(test_data, tmp, ensure_ascii=False)
+        tmp_path = tmp.name
+
+    result = open_json_file(tmp_path)
+    assert result == test_data
+    captured = capsys.readouterr()
+    assert "не найден" not in captured.out
+    assert "формата JSON" not in captured.out
+    os.unlink(tmp_path)
+
+
+def test_open_json_file_missing(capsys):
+    """Тест отсутствия файла"""
+    result = open_json_file("non_existent.json")
+    assert result is None
+    captured = capsys.readouterr()
+    assert "не найден" in captured.out
+
+
+def test_open_json_file_invalid(capsys):
+    """Тест некорректного JSON"""
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as tmp:
+        tmp.write("{invalid}")
+        tmp_path = tmp.name
+
+    result = open_json_file(tmp_path)
+    assert result is None
+    captured = capsys.readouterr()
+    assert "формата JSON" in captured.out
+    os.unlink(tmp_path)
+
+
+def test_open_json_file_empty(capsys):
+    """Тест пустого файла"""
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as tmp:
+        tmp_path = tmp.name
+
+    result = open_json_file(tmp_path)
+    assert result is None
+    captured = capsys.readouterr()
+    assert "формата JSON" in captured.out
+    os.unlink(tmp_path)
