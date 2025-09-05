@@ -39,9 +39,22 @@
 
 - src/generators.py `card_number_generator(begin: int, end: int) -> Iterator[str]`
 Генерирует номера карт в формате 16 цифр с ведущими нулями.
-- 
-### В папке tests подготовлены тесты ([test_masks.py](tests%2Ftest_masks.py), [test_processing.py](tests%2Ftest_processing.py), [test_widget.py](tests%2Ftest_widget.py), [test_generators.py](tests%2Ftest_generators.py))
-Функциональный код покрыт тестами на 100% на 16.08.2025г.
+
+## ![.](https://i.ibb.co/QxSg4m1/images-Photoroom.png) Парсинг финансовых данных
+
+Модуль `finance_parser.py` отвечает за чтение и предобработку транзакций из файлов.
+
+### Основные функции:
+- **`read_csv_transactions(file_path: str) -> list[dict]`**  
+  Читает CSV-файл с транзакциями и возвращает список словарей.  
+  **Формат CSV:**
+  ```csv
+  id,date,amount,currency,description,from,to,status
+  1,2024-03-11T02:26:18.671407,100.0,USD,Payment,Счет **1234,Visa 1234 56** **** 5678,EXECUTED
+  
+
+### В папке tests подготовлены тесты ([test_masks.py](tests%2Ftest_masks.py), [test_processing.py](tests%2Ftest_processing.py), [test_widget.py](tests%2Ftest_widget.py), [test_generators.py](tests%2Ftest_generators.py), [test_utils.py](tests%2Ftest_utils.py), [test_finance_parser.py](tests%2Ftest_finance_parser.py), [test_external_api.py](tests%2Ftest_external_api.py), [test_decorators.py](tests%2Ftest_decorators.py))
+Функциональный код покрыт тестами на 92% на 05.09.2025г.
 ### начало работы с программой
 1. git clone git@github.com:NikitinDenisAndreevich/Prodject5.git # Сконирование программы 
 2. poetry install # установка зависимостей
