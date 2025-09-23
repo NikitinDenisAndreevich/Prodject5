@@ -16,3 +16,9 @@ def test_get_mask_account(data, expected):
 def test_get_mask_card_number():
 
     assert "2543 36** **** 1234" == get_mask_card_number("2543362543361234")
+
+
+def test_get_mask_account_exception():
+    # Передаем некорректный тип (int), чтобы внутри произошла ошибка индексации
+    # и сработал блок except, возвращающий пустую строку
+    assert get_mask_account(12345678901234567890) == ""

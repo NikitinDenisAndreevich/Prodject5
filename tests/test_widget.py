@@ -1,6 +1,29 @@
 import pytest
 
-from src.widget import get_date, mask_account_card
+from src.widget import format_transaction, get_date, mask_account_card
+
+
+def test_mask_account_card_edge_cases():
+    assert mask_account_card("") == "Номер не указан"
+    assert mask_account_card("abc") == "Неверный формат номера"
+
+
+def test_format_transaction_branches():
+    tx = {
+        "description": "Оплата",
+        "operationAmount": {"amount": "0", "currency": {"code": "N/A"}},
+    }
+    out = format_transaction(tx)
+    assert "Дата не указана" in out
+
+    tx2 = {
+        "date": "2024-01-01T00:00:00",
+        "description": "Оплата",
+        "operationAmount": {"amount": "10", "currency": {"code": "RUB"}},
+        "to": "Счет 12345678901234567890",
+    }
+    out2 = format_transaction(tx2)
+    assert "Получатель:" in out2 or "->" in out2
 
 
 @pytest.mark.parametrize(

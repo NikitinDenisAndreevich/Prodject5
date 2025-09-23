@@ -1,6 +1,54 @@
+import re as _re
+
 import pytest
 
-from src.processing import filter_by_state, sort_by_date
+from src.processing import filter_by_state, process_bank_operations, process_bank_search, sort_by_date
+
+
+def test_process_bank_search_regex_error(monkeypatch):
+    # Смоделировать re.error
+    import src.processing as p
+
+    class DummyError(Exception):
+        pass
+
+    def bad_compile(_pattern, *_args, **_kwargs):
+        raise _re.error("bad")
+
+    monkeypatch.setattr(p.re, "compile", bad_compile)
+    data = [{"description": "abc"}]
+    # Должен вернуть исходные данные при ошибке re
+    assert process_bank_search(data, "(") == data
+
+
+def test_sort_by_date_bad_dates():
+    data = [
+        {"date": "bad"},
+        {"date": "2019-01-01T00:00:00"},
+    ]
+    # Некорректная дата сортируется как минимальная и идет первой при reverse=False
+    res = sort_by_date(data, reverse=False)
+    assert res[0]["date"] == "bad"
+
+
+def test_process_bank_search():
+    data = [
+        {'description': 'Payment for services'},
+        {'description': 'Monthly subscription'}
+    ]
+    assert len(process_bank_search(data, 'payment')) == 1
+
+
+def test_process_bank_operations():
+    data = [
+        {'description': 'Transfer'},
+        {'description': 'Transfer'},
+        {'description': 'Payment'}
+    ]
+    assert process_bank_operations(data, ['Transfer', 'Payment']) == {
+        'Transfer': 2,
+        'Payment': 1
+    }
 
 
 @pytest.fixture

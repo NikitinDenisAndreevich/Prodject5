@@ -1,0 +1,60 @@
+[33m5b171bc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/homework_12_1-2[m[33m, [m[1;31morigin/feature/homework_12_1-2[m[33m)[m HEAD@{0}: checkout: moving from feature/homework_12_1-2 to feature/homework_12_1-2
+[33m5b171bc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/homework_12_1-2[m[33m, [m[1;31morigin/feature/homework_12_1-2[m[33m)[m HEAD@{1}: branch: Reset to origin/feature/homework_12_1-2
+[33me94c021[m HEAD@{2}: merge origin/feature/homework_12_1-2: updating HEAD
+[33me94c021[m HEAD@{3}: commit (amend): проверил через isort, mypy, Flake8.
+[33m5b171bc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/homework_12_1-2[m[33m, [m[1;31morigin/feature/homework_12_1-2[m[33m)[m HEAD@{4}: commit: проверил через isort, mypy, Flake8
+[33ma8a827f[m HEAD@{5}: commit: добавил external_api.py, test_external_api.py, .env.example
+[33mf206e63[m HEAD@{6}: commit: добавил json и utils.py, test_utils.py
+[33m49176a3[m[33m ([m[1;31morigin/develop[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{7}: checkout: moving from feature/homework_11_2 to feature/homework_12_1-2
+[33m2bbbd2f[m[33m ([m[1;31morigin/feature/homework_11_2[m[33m, [m[1;32mfeature/homework_11_2[m[33m)[m HEAD@{8}: commit: decorators.py сделал догстринг
+[33m08ba9a4[m HEAD@{9}: commit: решаю ошибку
+[33m7d6db95[m HEAD@{10}: commit: Сделал decorators.py, test_decorators.py
+[33mf9f6f65[m HEAD@{11}: commit: Сделал decorators.py, test_decorators.py
+[33m4afa6f5[m HEAD@{12}: checkout: moving from feature/homework_11_2 to feature/homework_11_2
+[33m4afa6f5[m HEAD@{13}: branch: Reset to origin/feature/homework_11_2
+[33m4afa6f5[m HEAD@{14}: checkout: moving from feature/homework_11_1 to feature/homework_11_2
+[33md0e4b2f[m[33m ([m[1;31morigin/feature/homework_11_1[m[33m, [m[1;32mfeature/homework_11_1[m[33m)[m HEAD@{15}: commit: изменил gitignore убрав из ислючения папку htmlcov
+[33m6c2e67f[m HEAD@{16}: commit: isort коррекции
+[33m14240ba[m HEAD@{17}: commit: добавил в README.md ссылку на тесты и написал краткое описание новых функций
+[33m24bfcf1[m HEAD@{18}: commit: Добавил догстринги, и комментарии, так же добавил тесты и перепроверил корректность тестов. попутно проверил на flake8, mypy.
+[33mdb9a267[m HEAD@{19}: commit: сделал модуль generators.py и сделал в нем "рыбу" по функциям filter_by_currency, transaction_descriptions, card_number_generator
+[33meb7d8a5[m HEAD@{20}: merge origin/feature/homework_11_1: Fast-forward
+[33m6d2175c[m HEAD@{21}: checkout: moving from feature/homework_11_1 to feature/homework_11_1
+[33m6d2175c[m HEAD@{22}: branch: Reset to origin/feature/homework_11_1
+[33m6d2175c[m HEAD@{23}: checkout: moving from feature/homework_10_2 to feature/homework_11_1
+[33m82645cd[m[33m ([m[1;31morigin/feature/homework_10_2[m[33m, [m[1;32mfeature/homework_10_2[m[33m)[m HEAD@{24}: checkout: moving from feature/homework_11_1 to feature/homework_10_2
+[33m6d2175c[m HEAD@{25}: checkout: moving from feature/homework_10_2 to feature/homework_11_1
+[33m82645cd[m[33m ([m[1;31morigin/feature/homework_10_2[m[33m, [m[1;32mfeature/homework_10_2[m[33m)[m HEAD@{26}: commit: сделал корректировки согласно flake8, mypy, blake
+[33m3b306a1[m HEAD@{27}: commit: исправил test_processing.py
+[33m8629edf[m HEAD@{28}: commit: сделал test_processing.py
+[33md39473f[m HEAD@{29}: commit: сделал test_widget.py
+[33mc6d4ad2[m HEAD@{30}: commit: сделал тест_маскс и создал файл conftest.py
+[33m68d4907[m HEAD@{31}: commit: переставил README.md
+[33m6d2175c[m HEAD@{32}: checkout: moving from feature/homework_10_1 to feature/homework_10_2
+[33ma9ff7a0[m[33m ([m[1;31morigin/feature/homework_10_1[m[33m, [m[1;32mfeature/homework_10_1[m[33m)[m HEAD@{33}: commit: завершил homework_10_1
+[33m37db9a8[m HEAD@{34}: commit: Добавил в README.md мини инструкцию по началу работы с программой
+[33m70acf4c[m HEAD@{35}: commit: исправил sort_by_date. упростил за счет библиотеки datetime
+[33m4fe3b12[m HEAD@{36}: commit: README-файл с описанием проекта
+[33m5fcccc3[m HEAD@{37}: commit: финальные корректировкий под mypy/flake8/black
+[33m6643bd2[m HEAD@{38}: checkout: moving from 1d57dbda62ddc175e34ab3a15700f06a0f5d766d to feature/homework_10_1
+[33m1d57dbd[m HEAD@{39}: commit (amend): сделал функцию sort_by_date которая использует в своей работе функцию get_date и сортирует список словарей по дате в указанном порядке.
+[33m6643bd2[m HEAD@{40}: checkout: moving from feature/homework_10_1 to 6643bd22e58762c22d9aae38da91884f505cc6d5
+[33m6643bd2[m HEAD@{41}: commit: сделал функцию sort_by_date которая использует в своей работе функцию get_date
+[33m9ddee95[m HEAD@{42}: commit: feat(processing): add filter_by_state # Фильтрует список словарей по значению ключа 'state'
+[33m8083f87[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{43}: checkout: moving from main to feature/homework_10_1
+[33m8083f87[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{44}: checkout: moving from feature/homework_10_1 to main
+[33m8083f87[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{45}: checkout: moving from develop to feature/homework_10_1
+[33m8083f87[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{46}: checkout: moving from main to develop
+[33m8083f87[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{47}: checkout: moving from develop to main
+[33m8083f87[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{48}: checkout: moving from main to develop
+[33m8083f87[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m, [m[1;32mdevelop[m[33m)[m HEAD@{49}: commit: 27.07 незначительные корректировки кода import изменил убрал лишние строки
+[33m244fb77[m HEAD@{50}: commit: финальные изменения перед подачет проверка по блеку, флайк 8, mypy
+[33m01623ab[m HEAD@{51}: commit: добавил get_date и настроил
+[33m14d203b[m HEAD@{52}: commit: добавил нижний регистр для избежания ошибок в mask_account_card
+[33m96b9b20[m HEAD@{53}: commit: сделал относительный импорт к функции.
+[33m6d4490f[m HEAD@{54}: commit: перенес main.py в голову
+[33m277c785[m HEAD@{55}: commit: исправил недочеты программы
+[33m980a896[m HEAD@{56}: commit: Маскирует номер карты или счета в зависимости от типа
+[33mae44107[m HEAD@{57}: commit: подвел к предыдущим функциям и проверил через выбор пользователя
+[33md172371[m HEAD@{58}: commit: разделил по частям вводные данные на номер карты и данные карты
+[33m8400141[m HEAD@{59}: commit (initial): last work 25.07.2025

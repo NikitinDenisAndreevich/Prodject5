@@ -1,14 +1,13 @@
+import csv
 import json
 import logging
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
-# Настройка логгера для модуля utils
+from openpyxl import load_workbook
+
 logger = logging.getLogger('utils')
 logger.setLevel(logging.DEBUG)
-
-logger.debug("Тестовый DEBUG-лог")
-logger.info("Тестовый INFO-лог")
 
 file_handler = logging.FileHandler('utils.log', encoding='utf-8')
 file_formatter = logging.Formatter(
@@ -18,40 +17,127 @@ file_handler.setFormatter(file_formatter)
 logger.addHandler(file_handler)
 
 
-def load_transactions(file_path: str | Path) -> List[Dict[str, Any]]:
-    """
-    Загружает финансовые транзакции из JSON-файла с валидацией структуры.
-    Обрабатывает основные файловые ошибки и ошибки формата данных.
-    """
-    path = Path(file_path)
-    logger.debug(f"Попытка загрузки файла: {path}")
+def _validate_transaction(item: dict) -> bool:
+    """Валидация структуры транзакции"""
+    required_fields = {
+        'date',
+        'description',
+        'state',
+        'operationAmount'
+    }
 
+    if not all(field in item for field in required_fields):
+        return False
+
+    amount_info = item.get('operationAmount')
+    if not isinstance(amount_info, dict):
+        return False
+
+    return 'amount' in amount_info and 'currency' in amount_info
+
+
+def load_json_transactions(file_path: Path) -> List[Dict[str, Any]]:
+    """Загрузка данных из JSON-файла"""
     try:
-        if not path.is_file():
-            logger.warning(f"Файл не найден: {path}")
-            return []
-
-        if not path.exists():
-            logger.error(f"Путь не существует: {path}")
-            return []
-
-        with path.open(encoding='utf-8') as f:
-            logger.debug(f"Открытие файла: {path}")
+        with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-            logger.info(f"Успешно загружено {len(data)} записей из {path}")
-
-        valid_transactions = [
-            item for item in data
-            if isinstance(item, dict)
-            and isinstance(item.get("operationAmount"), dict)
-            and "amount" in item["operationAmount"]
-            and "currency" in item["operationAmount"]
-        ]
-
-        logger.debug(f"Найдено {len(valid_transactions)} валидных транзакций")
-        return valid_transactions
-
-    except (FileNotFoundError, json.JSONDecodeError,
-            UnicodeDecodeError, PermissionError) as e:
-        logger.error(f"Ошибка при обработке файла {path}: {str(e)}", exc_info=True)
+        if not isinstance(data, list):
+            return []
+        return [item for item in data if _validate_transaction(item)]
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON decode error: {str(e)}", exc_info=True)
         return []
+    except OSError as e:
+        logger.error(f"JSON file error: {str(e)}", exc_info=True)
+        return []
+
+
+def load_csv_transactions(file_path: Path) -> List[Dict[str, Any]]:
+    """Загрузка данных из CSV-файла с приведением к общей схеме транзакции."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f, delimiter=';')
+            transactions: List[Dict[str, Any]] = []
+
+            for row in reader:
+                try:
+                    normalized: Dict[str, Any] = {
+                        'id': row.get('id'),
+                        'date': row.get('date'),
+                        'description': row.get('description'),
+                        'state': row.get('state'),
+                        'from': row.get('from'),
+                        'to': row.get('to'),
+                        'operationAmount': {
+                            'amount': row.get('amount'),
+                            'currency': {
+                                'name': row.get('currency_name'),
+                                'code': row.get('currency_code')
+                            }
+                        }
+                    }
+
+                    if _validate_transaction(normalized):
+                        transactions.append(normalized)
+                except Exception:
+                    continue
+
+            return transactions
+    except Exception as e:
+        logger.error(f"CSV error: {str(e)}", exc_info=True)
+        return []
+
+
+def load_excel_transactions(file_path: Path) -> List[Dict[str, Any]]:
+    """Загрузка данных из Excel-файла"""
+    try:
+        wb = load_workbook(filename=file_path, read_only=True)
+        sheet = wb.active
+        headers = [str(cell.value).strip().lower() for cell in next(sheet.rows)]
+
+        transactions: List[Dict[str, Any]] = []
+        for row in sheet.iter_rows(min_row=2):
+            row_values: Dict[str, Any] = {
+                headers[i]: cell.value for i, cell in enumerate(row)
+            }
+
+            # Нормализация в общую схему
+            normalized: Dict[str, Any] = {
+                'id': row_values.get('id'),
+                'date': row_values.get('date'),
+                'description': row_values.get('description'),
+                'state': row_values.get('state'),
+                'from': row_values.get('from'),
+                'to': row_values.get('to'),
+                'operationAmount': {
+                    'amount': row_values.get('amount'),
+                    'currency': {
+                        'name': row_values.get('currency_name'),
+                        'code': row_values.get('currency_code')
+                    }
+                }
+            }
+
+            if _validate_transaction(normalized):
+                transactions.append(normalized)
+        return transactions
+    except Exception as e:
+        logger.error(f"Excel error: {str(e)}", exc_info=True)
+        return []
+
+
+def load_transactions(file_path: Union[str, Path]) -> List[Dict[str, Any]]:
+    """Загружает транзакции с автоматическим определением формата файла"""
+    path = Path(file_path)
+
+    if not path.exists():
+        raise FileNotFoundError(f"File {path} does not exist")
+
+    if path.suffix.lower() == '.json':
+        return load_json_transactions(path)
+    elif path.suffix.lower() == '.csv':
+        return load_csv_transactions(path)
+    elif path.suffix.lower() in ('.xlsx', '.xls'):
+        return load_excel_transactions(path)
+
+    raise ValueError(f"Unsupported file format: {path.suffix}")

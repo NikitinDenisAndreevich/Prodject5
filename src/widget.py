@@ -1,36 +1,79 @@
+from datetime import datetime
+from typing import Dict, Optional
+
 from src import masks
 
 
-def mask_account_card(card: str) -> str:
-    """Маскирует номер карты или счета в зависимости от типа
-    """
+def mask_account_card(number: str) -> str:
+    """Маскирует номер карты или счета с автоматическим определением типа"""
+    if not number:
+        return "Номер не указан"
 
-    # Ключевое слово для идентификации типа "Счет"
-    test_word = "счет"
+    # Сохраняем префикс (например, "Счет", "Visa Classic" и т.п.)
+    parts = number.split()
+    prefix = ""
+    if parts:
+        # Префикс — все, кроме последнего токена, если последний — цифры
+        if any(ch.isdigit() for ch in parts[-1]):
+            prefix = " ".join(parts[:-1]).strip()
+        else:
+            prefix = " ".join(parts).strip()
 
-    # Разбиваем строку на составляющие слова
-    card_parts = card.lower().split()
+    normalized = number.lower().replace(" ", "")
+    is_account = "счет" in normalized
+    digits = "".join(c for c in number if c.isdigit())
 
-    if test_word in card_parts:
-        # Маскировка для карты (берем последние 20 символов)
-        masked_number = masks.get_mask_account(card[-20:])
-        masked_result = card[:-20] + masked_number
-    else:
-        # Маскировка для счета (берем последние 16 символов)
-        masked_number = masks.get_mask_card_number(card[-16:])
-        masked_result = card[:-16] + masked_number
+    try:
+        if is_account or len(digits) == 20:  # Счет
+            masked = masks.get_mask_account(digits)
+            return f"{prefix} {masked}".strip() if prefix else masked
+        elif 16 <= len(digits) <= 20:  # Карта
+            masked = masks.get_mask_card_number(digits)
+            return f"{prefix} {masked}".strip() if prefix else masked
+        else:
+            return "Неверный формат номера"
+    except (ValueError, IndexError):
+        return "Ошибка маскирования"
 
-    return masked_result
+
+def get_date(date_str: str) -> Optional[str]:
+    """Преобразует дату из ISO формата в DD.MM.YYYY с обработкой ошибок"""
+    if not date_str:
+        return None
+
+    try:
+        dt = datetime.fromisoformat(date_str.replace('Z', ''))  # Для Python 3.11+
+        return dt.strftime("%d.%m.%Y")
+    except (ValueError, TypeError):
+        return None
 
 
-def get_date(date: str) -> str:
-    """функция меняет формат даты.
-    Принимает на вход строку с датой в формате
-    "2024-03-11T02:26:18.671407"
-    и возвращает строку с датой в формате
-    "ДД.ММ.ГГГГ"("11.03.2024")
-    """
-    year = date[:4]
-    month = date[5:7]
-    day = date[8:10]
-    return f"{day}.{month}.{year}"
+def format_transaction(tx: Dict) -> str:
+    """Форматирует транзакцию для вывода с защитой от отсутствующих данных"""
+    parts = []
+
+    # Дата
+    raw_date = tx.get('date')
+    formatted_date = get_date(raw_date) if raw_date else "Дата не указана"
+    description = tx.get('description', 'Без описания')
+    parts.append(f"{formatted_date} {description}")
+
+    # Отправитель/получатель
+    from_account = mask_account_card(tx.get('from', ''))
+    to_account = mask_account_card(tx.get('to', ''))
+
+    if from_account and to_account:
+        parts.append(f"{from_account} -> {to_account}")
+    elif to_account:
+        parts.append(f"Получатель: {to_account}")
+    elif from_account:
+        parts.append(f"Отправитель: {from_account}")
+
+    # Сумма и валюта (operationAmount)
+    op = tx.get('operationAmount') or {}
+    amount = op.get('amount', 0)
+    curr = op.get('currency') or {}
+    currency_code = curr.get('code', 'N/A')
+    parts.append(f"Сумма: {amount} {currency_code}")
+
+    return '\n'.join(parts)

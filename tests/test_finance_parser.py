@@ -72,3 +72,13 @@ def test_empty_files(file_type, func, patcher, expected_log):
         with patch.object(logging, 'info') as mock_info:
             assert len(func(f"empty.{file_type}")) == 0
             mock_info.assert_called_with(f"Успешно загружено 0 транзакций из {expected_log}")
+
+
+def test_read_csv_transactions_file_not_found(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        read_csv_transactions(str(tmp_path / "missing.csv"))
+
+
+def test_read_excel_transactions_file_not_found(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        read_excel_transactions(str(tmp_path / "missing.xlsx"))
