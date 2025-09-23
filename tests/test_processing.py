@@ -1,7 +1,24 @@
 import pytest
 
-from src.processing import filter_by_state, sort_by_date
+from src.processing import process_bank_search, process_bank_operations, filter_by_state, sort_by_date
 
+def test_process_bank_search():
+    data = [
+        {'description': 'Payment for services'},
+        {'description': 'Monthly subscription'}
+    ]
+    assert len(process_bank_search(data, 'payment')) == 1
+
+def test_process_bank_operations():
+    data = [
+        {'description': 'Transfer'},
+        {'description': 'Transfer'},
+        {'description': 'Payment'}
+    ]
+    assert process_bank_operations(data, ['Transfer', 'Payment']) == {
+        'Transfer': 2,
+        'Payment': 1
+    }
 
 @pytest.fixture
 def test_data():
