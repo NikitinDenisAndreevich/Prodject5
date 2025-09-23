@@ -1,16 +1,16 @@
 import re
-from collections import defaultdict
+from collections import Counter
 from datetime import datetime
-from typing import List, Dict
+from typing import Dict, List
 
 
-def filter_by_state(data: List[Dict], state: str) -> List[Dict]:
+def filter_by_state(data: List[Dict], state: str = "EXECUTED") -> List[Dict]:
     """Фильтрация транзакций по статусу с приведением к верхнему регистру"""
     target_state = state.upper()
     return [
         tx for tx in data
         if isinstance(tx.get('state'), str)
-           and tx['state'].upper() == target_state
+        and tx['state'].upper() == target_state
     ]
 
 
@@ -34,21 +34,27 @@ def process_bank_search(data: List[Dict], search: str) -> List[Dict]:
         return [
             tx for tx in data
             if isinstance(tx.get('description'), str)
-               and pattern.search(tx['description'])
+            and pattern.search(tx['description'])
         ]
     except re.error:
         return data
 
 
 def process_bank_operations(data: List[Dict], categories: List[str]) -> Dict[str, int]:
-    """Подсчет операций по категориям с сохранением оригинального регистра"""
-    category_counts = defaultdict(int)
-    normalized_mapping = {c.lower(): c for c in categories}
+    """Подсчет количества операций по списку категорий (по полю description).
+
+    - Учитывает категории без учета регистра описания
+    - Сохраняет оригинальное написание категорий, переданное пользователем
+    - Использует collections.Counter
+    """
+    normalized_to_original = {c.lower(): c for c in categories}
+    counter = Counter()
 
     for tx in data:
-        description = tx.get('description', '').lower()
-        if description in normalized_mapping:
-            original_category = normalized_mapping[description]
-            category_counts[original_category] += 1
+        description = str(tx.get('description', '')).lower()
+        original = normalized_to_original.get(description)
+        if original:
+            counter[original] += 1
 
-    return dict(category_counts)
+    # вернуть обычный dict
+    return dict(counter)

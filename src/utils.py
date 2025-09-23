@@ -1,9 +1,10 @@
-import logging
-from typing import Any, Dict, List, Union
-import json
 import csv
-from openpyxl import load_workbook
+import json
+import logging
 from pathlib import Path
+from typing import Any, Dict, List, Union
+
+from openpyxl import load_workbook
 
 logger = logging.getLogger('utils')
 logger.setLevel(logging.DEBUG)
@@ -40,20 +41,48 @@ def load_json_transactions(file_path: Path) -> List[Dict[str, Any]]:
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
+        if not isinstance(data, list):
+            return []
         return [item for item in data if _validate_transaction(item)]
-    except Exception as e:
-        logger.error(f"JSON error: {str(e)}", exc_info=True)
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON decode error: {str(e)}", exc_info=True)
+        return []
+    except OSError as e:
+        logger.error(f"JSON file error: {str(e)}", exc_info=True)
         return []
 
 
 def load_csv_transactions(file_path: Path) -> List[Dict[str, Any]]:
-    """Загрузка данных из CSV-файла"""
+    """Загрузка данных из CSV-файла с приведением к общей схеме транзакции."""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
-            return [
-                row for row in csv.DictReader(f)
-                if _validate_transaction(row)
-            ]
+            reader = csv.DictReader(f, delimiter=';')
+            transactions: List[Dict[str, Any]] = []
+
+            for row in reader:
+                try:
+                    normalized: Dict[str, Any] = {
+                        'id': row.get('id'),
+                        'date': row.get('date'),
+                        'description': row.get('description'),
+                        'state': row.get('state'),
+                        'from': row.get('from'),
+                        'to': row.get('to'),
+                        'operationAmount': {
+                            'amount': row.get('amount'),
+                            'currency': {
+                                'name': row.get('currency_name'),
+                                'code': row.get('currency_code')
+                            }
+                        }
+                    }
+
+                    if _validate_transaction(normalized):
+                        transactions.append(normalized)
+                except Exception:
+                    continue
+
+            return transactions
     except Exception as e:
         logger.error(f"CSV error: {str(e)}", exc_info=True)
         return []
@@ -66,14 +95,31 @@ def load_excel_transactions(file_path: Path) -> List[Dict[str, Any]]:
         sheet = wb.active
         headers = [str(cell.value).strip().lower() for cell in next(sheet.rows)]
 
-        transactions = []
+        transactions: List[Dict[str, Any]] = []
         for row in sheet.iter_rows(min_row=2):
-            transaction = {
-                headers[i]: str(cell.value)
-                for i, cell in enumerate(row)
+            row_values: Dict[str, Any] = {
+                headers[i]: cell.value for i, cell in enumerate(row)
             }
-            if _validate_transaction(transaction):
-                transactions.append(transaction)
+
+            # Нормализация в общую схему
+            normalized: Dict[str, Any] = {
+                'id': row_values.get('id'),
+                'date': row_values.get('date'),
+                'description': row_values.get('description'),
+                'state': row_values.get('state'),
+                'from': row_values.get('from'),
+                'to': row_values.get('to'),
+                'operationAmount': {
+                    'amount': row_values.get('amount'),
+                    'currency': {
+                        'name': row_values.get('currency_name'),
+                        'code': row_values.get('currency_code')
+                    }
+                }
+            }
+
+            if _validate_transaction(normalized):
+                transactions.append(normalized)
         return transactions
     except Exception as e:
         logger.error(f"Excel error: {str(e)}", exc_info=True)

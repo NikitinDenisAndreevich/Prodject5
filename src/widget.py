@@ -1,6 +1,7 @@
-from src import masks
 from datetime import datetime
 from typing import Dict, Optional
+
+from src import masks
 
 
 def mask_account_card(number: str) -> str:
@@ -8,15 +9,27 @@ def mask_account_card(number: str) -> str:
     if not number:
         return "Номер не указан"
 
+    # Сохраняем префикс (например, "Счет", "Visa Classic" и т.п.)
+    parts = number.split()
+    prefix = ""
+    if parts:
+        # Префикс — все, кроме последнего токена, если последний — цифры
+        if any(ch.isdigit() for ch in parts[-1]):
+            prefix = " ".join(parts[:-1]).strip()
+        else:
+            prefix = " ".join(parts).strip()
+
     normalized = number.lower().replace(" ", "")
     is_account = "счет" in normalized
-    digits = "".join(c for c in normalized if c.isdigit())
+    digits = "".join(c for c in number if c.isdigit())
 
     try:
         if is_account or len(digits) == 20:  # Счет
-            return masks.mask_account(digits)
+            masked = masks.get_mask_account(digits)
+            return f"{prefix} {masked}".strip() if prefix else masked
         elif 16 <= len(digits) <= 20:  # Карта
-            return masks.mask_card_number(digits)
+            masked = masks.get_mask_card_number(digits)
+            return f"{prefix} {masked}".strip() if prefix else masked
         else:
             return "Неверный формат номера"
     except (ValueError, IndexError):
@@ -56,9 +69,11 @@ def format_transaction(tx: Dict) -> str:
     elif from_account:
         parts.append(f"Отправитель: {from_account}")
 
-    # Сумма и валюта
-    amount = tx.get('amount', 0)
-    currency = tx.get('currency', 'N/A')
-    parts.append(f"Сумма: {amount} {currency}")
+    # Сумма и валюта (operationAmount)
+    op = tx.get('operationAmount') or {}
+    amount = op.get('amount', 0)
+    curr = op.get('currency') or {}
+    currency_code = curr.get('code', 'N/A')
+    parts.append(f"Сумма: {amount} {currency_code}")
 
     return '\n'.join(parts)
